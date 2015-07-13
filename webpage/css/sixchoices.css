@@ -1,0 +1,15 @@
+.center-block {
+	margin: 0px auto;
+}
+
+.align-center {
+	text-align: center;
+}
+
+.choice {
+	margin: 2px;
+}
+
+.selected {
+	border: 5px solid blue;
+}
