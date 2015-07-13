@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>6Choice Personal Survey</title>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="https://raw.githubusercontent.com/kombai/freewall/master/freewall.js"></script>
+		<script type="text/javascript" src="https://cdn.firebase.com/js/client/2.2.7/firebase.js"></script>
+		<script type="text/javascript" src="js/firebase-integration.js"></script>
+		<style type="text/css">
+			body {
+				width: 90%;
+				margin: 0 auto;
+			}
+
+			div#quizz {
+				width: 80%;
+				margin: 0 auto;
+			}
+
+			.choice {
+				height: 320px;
+			}
+
+			.selected {
+				border: 5px solid blue;
+			}
+		</style>
+	</head>
+	<body>
+		<h3>Select <span id="numberToChoose"></span> more pictures you like the most! </h3>
+
+		<div id="quizz">
+			<img class="choice" alt="adrenaline_sporty" src="img/1.adrenaline_sporty1.jpg" />
+			<img class="choice" alt="adventurous_sporty" src="img/2.adventurous_sporty.jpg" />
+			<img class="choice" alt="sport_team_adrenaline" src="img/3.Sport_team_adrenaline.jpg" />
+			<img class="choice" alt="adventure_puzzle" src="img/4.adventure_puzzles.jpg" /> 
+			<img class="choice" alt="chill_drinks" src="img/5.chill_drinks.jpg" />
+			<img class="choice" alt="chill_luxury" src="img/6.Chill_luxury1.jpg" />
+			<img class="choice" alt="chill_drinks_luxury" src="img/7.chill_drinks_luxury.jpg" />
+			<img class="choice" alt="food_healthy" src="img/8.Food_healthy.jpg" />
+			<img class="choice" alt="food_chill_health" src="img/9.Food_chill_healthy.jpg" />
+			<img class="choice" alt="culture_chill" src="img/10.culture_chill1.jpg" /> 
+			<img class="choice" alt="culture" src="img/11.Culture.jpg" />
+			<img class="choice" alt="exploring_adventure" src="img/12.exploring_adventure.jpg" /> 
+			<img class="choice" alt="romantic_chill" src="img/13.Romantic_chill.jpg" />
+			<img class="choice" alt="chill_luxury" src="img/14.Chill_luxury.jpg" />
+			<img class="choice" alt="soldier_sport_adventure" src="img/15.soldier_sport_adventure.jpg" />
+			<img class="choice" alt="unknown" src="img/16.unknown.jpg" /> 
+		</div>
+
+		<input type="submit" value="Submit!" id="submitButton" />
+
+		<script type="text/javascript">
+			var db = new Database();
+			var picturesToChoose = 5;
+
+			var updateHeader = function() {
+				$("#numberToChoose").text(picturesToChoose - chosenSoFar());	
+			};
+
+			var enableDisableSubmit = function() {
+				if (hasMoreToChoose()) {
+					$("#submitButton").attr("disabled", "true");
+				} else {
+					$("#submitButton").removeAttr("disabled");
+				}
+			};
+
+			var chosenSoFar = function() {
+				var chosenSoFar = 0;
+				$.each($(".choice"), function(index, value) {
+					if ($(value).hasClass("selected")) {
+						chosenSoFar++;
+					}
+				});
+				return chosenSoFar;
+			};
+
+			var hasMoreToChoose = function() {
+				return chosenSoFar() < picturesToChoose;
+			};
+
+			var choicesToList = function() {
+				var chosenList = [];
+				$.each($(".choice"), function(index, value) {
+					if ($(value).hasClass("selected")) {
+						chosenList.push($(value).attr("alt"));
+					}
+				});
+				return chosenList;
+			};
+
+			var unselectAll = function() {
+				$.each($(".choice"), function(index, value) {
+					$(value).removeClass("selected");
+				});
+			};
+
+			$(function() {
+				// freewall setup
+				var mozaic = new freewall("#quizz");
+				mozaic.fitWidth();
+
+				// When clicked on choice, either add selected or remove selected class, number of choice with selected class denotes number of selected choices
+				$(".choice").click(function () {
+					if ($(this).hasClass("selected")) {
+						$(this).removeClass("selected");
+ 					} else {
+ 						if (hasMoreToChoose()) {
+ 							$(this).addClass("selected");
+ 						}
+ 					}
+ 					updateHeader();
+ 					enableDisableSubmit();
+				});
+
+				$("#submitButton").click(function() {
+					var recordId = db.submit(choicesToList());
+					alert('Thank you! Your id is: "' + recordId + '", please write it down somewhere');
+					unselectAll();
+					updateHeader();
+ 					enableDisableSubmit();
+				})
+				enableDisableSubmit();
+				updateHeader();
+			});
+		</script>	
+	</body>
+</html>
